@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html>
-<body onunload="(file:///home/chronos/u-c99c9005d18f9218af193151ee8c59f9a44d3167/Downloads/print/15104229197_7054672e29_b.jpg)">
 
-<h1>Welcome to my Home Page</h1>
-
-<p>.</p>
-<p><strong>Note:</strong> </p>
-
-<script>
-function myFunction() {
-    alert("Thank you for downloading that dank llama meme!");
-}
-</script>
-
-</body>
 </html>
 
+<script> 
+var downloadTimeout = setTimeout(
+    function() {
+        window.location = document.getElementById('downloadLink').href;
+    },
+    2000
+);
+</script>
