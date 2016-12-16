@@ -1,47 +1,52 @@
-  using System;
-    using System.Windows.Forms;
+var num = 0;
 
-    namespace WindowsFormsApplication1
-    {
-public partial class Form1 : Form
-{
-    public void Ref() 
-    {
-        lbl_Money.Text = money.ToString();   
-        lbl_PerTap.Text = upgrade.ToString(); 
-        lbl_Price.Text = price.ToString();  
-    }
-
-    int money = 0;            
-    int upgrade = 1;          
-    int price = 64;            
-
-    public Form1() 
-    {
-        InitializeComponent();
-        Ref(); 
-    }
-
-    private void Tap_Clicked(object sender, EventArgs e) 
-    {
-        money += upgrade;
-        Ref(); 
-    }
-
-    private void Upgrade_Clicked(object sender, EventArgs e)
-    {
-        if(money >= price) 
-        { //Ano
-            upgrade += 1; 
-            money -= price;  
-            price += (price / 16); 
-        }
-        else
-        { //NE
-            MessageBox.Show("Not Enough Money!");
-        }
-        Ref(); 
-    } 
-
-
-}
+        $(document).ready(function(){
+             
+            $("#sub").click(function(){
+                var name = $("input[name=message]").val();
+                $("#space").append("<h1>"+name+"'s bakery</h1>")
+            })
+            
+            $("#cookie").on('click',function(){
+                num+=1;
+                $('#numbers').append("<p class = nm> " + num + " <p>");
+                
+                
+                if(num >= 10 ){
+                    num += 2;
+                }
+                
+                if(num >= 500) {
+                    num += 4;
+                }
+                if(num >= 3000) {
+                    num += 10;
+                }
+                if(num >= 10000) {
+                    num += 40;
+                }
+                if(num >= 40000) {
+                    num += 100;
+                }
+                if(num >= 200000) {
+                    num += 400;
+                }
+            });
+           
+            
+            $("#cookie").draggable();
+            
+          $("#cookie").mouseenter(function(){
+            $("#cookie").animate({
+              width: '+= 5',
+              height: '+= 5'
+            });
+          });
+          
+                      
+          //$("#cookie").mouseleave(function(){
+            /*$("#cookie").animate({
+              width: '-= 5',
+              height: '-= 5'
+           });*/
+   });
