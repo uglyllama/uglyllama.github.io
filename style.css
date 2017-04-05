@@ -1,0 +1,125 @@
+body {
+    font-family: Helvetica;
+    background: #EEEEEE;
+    overflow-y: scroll;
+}
+
+ul.menuTabs {
+    text-align: center;
+    list-style: none;
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+ul.menuTabs li {
+    padding: 3px 30px 0 30px;
+    font-size: 1.1em;
+    display: inline-block;
+    border: 1px solid #BBBBBB;
+    background: #DDDDDD;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+ul.menuTabs li:hover {
+    cursor: pointer;
+}
+
+ul li.selected {
+    background: #FFF;
+    border-bottom: none;
+}
+
+.content {
+    overflow: hidden;
+    width: 100%;
+}
+
+.characterInfo {
+    position: fixed;
+    right: 10px;
+    padding: 10px;
+    border: 1px dashed #BBB;
+    width: 300px;
+}
+
+.tabContent {
+    margin-right: 323px;
+    padding: 20px;
+    border: 1px dashed #BBB;
+}
+
+#combatLog {
+    height: 150px;
+    overflow-y: scroll;
+}
+
+.skillButton {
+    padding: 10px 15px;
+}
+
+.upgradeBar {
+    color: #EFEFEF;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.upgradeBar:nth-child(even) {
+    background: #444444;
+}
+
+.upgradeBar:nth-child(odd) {
+    background: #666666;
+}
+
+.placeBar {
+    color: #EFEFEF;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.placeBar:nth-child(odd) {
+    background: #444444;
+}
+
+.placeBar:nth-child(even) {
+    background: #666666;
+}
+
+span#changelogTab {
+    cursor: pointer;
+}
+
+.noteContainer {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+}
+
+.notificationBar {
+    width: 100%;
+    background: #FFFF99;
+    border-top: 1px solid #999999;
+    text-align: center;
+    padding: 10px;
+}
+
+footer {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    text-align: right;
+    color: #AAA;
+    font-size: 0.8em;
+    z-index: 3;
+}
+
+td:last-child {
+    text-align: right;
+}

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RPG Clicker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.0.0/knockout-min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/knockout.mapping/2.4.1/knockout.mapping.js"></script>
+
+    <script type="text/javascript" src="main.js"></script>
+    <script type="text/javascript" src="moves.js"></script>
+    <script type="text/javascript" src="items.js"></script>
+    <script type="text/javascript" src="character.js"></script>
+    <script type="text/javascript" src="upgrades.js"></script>
+    <script type="text/javascript" src="places.js"></script>
+    <script type="text/javascript" src="monsters.js"></script>
+    <script type="text/javascript" src="combat.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Bootstrap Core CSS -->
+    <link href="/resources/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Navbar Fixed Top CSS -->
+    <link href="/resources/css/bootstrap-navbar-fixed-top.css" rel="stylesheet">
+    <!-- Sticky Footer CSS -->
+    <link href="/resources/css/bootstrap-sticky-footer.css" rel="stylesheet">
+
+    <!-- Google Analytics -->
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-47283544-1', 'systempunch.com');
+        ga('send', 'pageview');
+
+    </script>
+
+    <style>
+        .nav-tabs {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div id="wrap">
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"><span
+                        class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span
+                        class="icon-bar"></span> <span class="icon-bar"></span></button>
+                <a class="navbar-brand" href="/">SystemPunch</a></div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="/rpg-clicker">RPG Clicker</a></li>
+                    <li><a href="/nba-superstars">NBA Superstars</a></li>
+                    <li><a href="/machine-rps">Machine Rock/Paper/Scissors</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <ul class="nav nav-tabs nav-justified">
+            <li class="active"><a href="#mainTab" data-toggle="tab">Main</a></li>
+            <li><a href="#inventoryTab" data-toggle="tab">Inventory</a></li>
+            <li><a href="#combatTab" data-toggle="tab">Combat</a></li>
+            <li><a href="#exploreTab" data-toggle="tab">Explore</a></li>
+            <li><a href="#locationTab" data-toggle="tab">Places</a></li>
+            <li><a href="#upgradesTab" data-toggle="tab">Perks</a></li>
+            <li><a href="#optionsTab" data-toggle="tab">Options</a></li>
+        </ul>
+        <div class="tab-content col-md-9">
+            <div class="tab-pane fade in active" id="mainTab">
+                <div id="characterStats" class="col-md-3">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr><th data-bind="text: character.name"></th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Level <span data-bind="text: character.level"></span></td><td></td></tr>
+                            <tr><td><span data-bind="text: character.HP"></span> / <span data-bind="text: character.maxHP"></span> HP</td><td></td></tr>
+                            <tr><td><span data-bind="text: character.AP"></span> / <span data-bind="text: character.maxAP"></span> AP</td><td></td></tr>
+                            <tr><td><span data-bind="text: character.currentXP"></span> / <span data-bind="text: character.neededXP"></span> XP</td><td></td></tr>
+                            <tr><td>&nbsp;</td><td></td></tr>
+                            <tr><td>Attack</td><td><span data-bind="text: character.attack"></span> +<span class="text-success" data-bind="text: character.attackMod"></span></td></tr>
+                            <tr><td>Special Attack</td><td><span data-bind="text: character.spA"></span> +<span class="text-success" data-bind="text: character.spAMod"></span></td></tr>
+                            <tr><td>Defense</td><td><span data-bind="text: character.defense"></span> +<span class="text-success" data-bind="text: character.defenseMod"></span></td></tr>
+                            <tr><td>Special Defense</td><td><span data-bind="text: character.spD"></span> +<span class="text-success" data-bind="text: character.spDMod"></span></td></tr>
+                            <tr><td>Speed</td><td><span data-bind="text: character.speed"></span> +<span class="text-success" data-bind="text: character.speedMod"></span></td></tr>
+                            <tr><td>&nbsp;</td><td></td></tr>
+                            <tr><td>HP Regen/second</td><td data-bind="text: character.autoheal().toFixed(2)"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="proficiencies" class="col-md-3">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr><th>Proficiencies</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Unarmed</td><td data-bind="text: character.unarmedProf"></td></tr>
+                            <tr><td>Blades</td><td data-bind="text: character.bladeProf"></td></tr>
+                            <tr><td>Bows</td><td data-bind="text: character.bowProf"></td></tr>
+                            <tr><td>Shields</td><td data-bind="text: character.shieldProf"></td></tr>
+                            <tr><td>Magic</td><td data-bind="text: character.magicProf"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="gameStats" class="col-md-3">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr><th>Game Stats</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>XP per Click</td><td data-bind="text: character.clickXP"></td></tr>
+                            <tr><td>XP per Second</td><td data-bind="text: character.XPS"></td></tr>
+                            <tr><td>&nbsp;</td><td></td></tr>
+                            <tr><td>Gold per Click</td><td data-bind="text: character.clickGold"></td></tr>
+                            <tr><td>Gold per Second</td><td data-bind="text: character.GPS"></td></tr>
+                            <tr><td>&nbsp;</td><td></td></tr>
+                            <tr><td>Enemies Killed</td><td data-bind="text: character.enemiesKilled"></td></tr>
+                            <tr><td>Times Died</td><td data-bind="text: character.timesDied"></td></tr>
+                            <tr><td>&nbsp;</td><td></td></tr>
+                            <tr><td>Total Clicks</td><td data-bind="text: character.totalClicks"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="inventoryTab">
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#shopModal">Enter Shop</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Equipment</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="equipmentList">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Consumables</h3>
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="consumableList">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="combatTab">
+                <div class="col-md-3">
+                    <label for="monsterList">Select Monster</label>
+                    <select class="form-control" id="monsterList">
+
+                    </select>
+                    <br />
+                    <button class="btn btn-primary" id="fightMonster">Fight Monster</button>
+                </div>
+                <div class="col-md-9">
+                    <div class="row" id="healthBars">
+                        <label>Your HP and AP:</label>
+                        <div class="progress" style="margin-bottom:5px;">
+                            <div class="progress-bar progress-bar-success" id="playerHealth" style="width: 50%;">
+                            </div>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-primary" id="playerAP" style="width: 50%;">
+                            </div>
+                        </div>
+                        <label>Enemy HP:</label>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-danger" id="enemyHealth" style="width: 50%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="panel panel-default" id="combatLogPanel">
+                            <ul class="list-group" id="combatLog">
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row" id="struggleDiv">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-danger btn-lg btn-block" id="struggle">STRUGGLE<br />Causes recoil damage to the user</button>
+                        </div>
+                    </div>
+                    <div class="row" id="skillButtons">
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="exploreTab">COMING SOON</div>
+            <div class="tab-pane fade" id="locationTab">
+                Places
+            </div>
+            <div class="tab-pane fade" id="upgradesTab">
+                <div id="upgradeCounter"></div>
+            </div>
+            <div class="tab-pane fade" id="optionsTab">
+                <p>
+                <p>
+                    <button type="button" class="btn btn-primary" onclick="toggleAutoSaving()">Toggle Auto-Saving
+                    </button>
+                    Auto-Saving is currently: <span id="autoSaveStatus"></span>
+                </p>
+                <p>
+                    <button type="button" class="btn btn-primary" onclick="saveGame()">Save Game</button>
+                    <button type="button" class="btn btn-primary" onclick="loadGame()">Load Game</button>
+                </p>
+                <p>Time since last save: <span id="timeSinceLastSave"></span> second(s)</p>
+
+                <p>
+                    <button type="button" class="btn btn-primary"
+                            onclick="character.name = prompt('What is your name?') || character.name; updateCharacterPanel();">Change Character Name
+                    </button>
+                </p>
+                <p>
+                    <button type="button" class="btn btn-primary" onclick="newGame()">Reset Save</button>
+                </p>
+                </p>
+                <p>
+                    Current stable version: <span id="version"></span><br/>
+                    <a href="/rpg-clicker/dev">Latest dev version: <span id="devVersion"></span></a><br/>
+                    <a href="#changelogTab" id="changelogTabLink">Changelog</a>
+                </p>
+
+                <div class="page-header">
+                    <h3>I want to help!</h3>
+                </div>
+                <p>Great! If you really want to, you can donate to me using the buttons below. You'll be helping me pay server bills and continue development!</p>
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                    <input type="hidden" name="cmd" value="_s-xclick">
+                    <input type="hidden" name="hosted_button_id" value="HY3UYPS92QVZL">
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+                </form>
+                <a class="coinbase-button" data-code="fb1d85db17bf03023c150f3e613bea73" data-button-style="donation_large" href="https://coinbase.com/checkouts/fb1d85db17bf03023c150f3e613bea73">Donate Bitcoins</a><script src="https://coinbase.com/assets/button.js" type="text/javascript"></script>
+            </div>
+            <div class="tab-pane fade" id="changelogTab">
+                <h2><span style="text-decoration:underline;">Changelog</span></h2>
+                <h4 style="margin-bottom:0px;">Version 0.3.14</h4>
+                <ul style="margin-top:0px;">
+                    <li>Further reduced DOM manipulations with addition of Knockout</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.13</h4>
+                <ul style="margin-top:0px;">
+                    <li>Added stat modifiers to main tab</li>
+                    <li>Added info buttons to equipment list</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.12</h4>
+                <ul style="margin-top:0px;">
+                    <li>Update character panels on game load</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.11</h4>
+                <ul style="margin-top:0px;">
+                    <li>Reduced DOM manipulations</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.10</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed Goblin loot table</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.9</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed Centaur</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.8</h4>
+                <ul style="margin-top:0px;">
+                    <li>Added 2 new monsters</li>
+                    <li>Added some new skills</li>
+                    <li>Added new weapon</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.7</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed bug with version check timer not resetting</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.7</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed game-breaking bug with move storage (whoop, teehee)</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.6</h4>
+                <ul style="margin-top:0px;">
+                    <li>Slowed down version checking to cut down on requests to the server</li>
+                    <li>Prepared new weapon, move, and monster (not live yet)</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.5</h4>
+                <ul style="margin-top:0px;">
+                    <li>Added queueing system to notifications. They should now no longer fill the screen</li>
+                    <li>Fixed display issue with HP regen</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.4</h4>
+                <ul style="margin-top:0px;">
+                    <li>Mostly behind the scenes reworking</li>
+                    <li>Styling changes</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.3</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed long-hidden bug with enemy speed calculation (D'OH!)</li>
+                    <li>Some combat log output formatting changes</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.2</h4>
+                <ul style="margin-top:0px;">
+                    <li>Added new Unarmed move</li>
+                    <li>Implemented combat paralysis (currently does not wear off outside of combat)</li>
+                    <li>Added Smelling Salts (paralysis cure)</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.1</h4>
+                <ul style="margin-top:0px;">
+                    <li>Reduced AP cost of Sweep Kick</li>
+                    <li>Buffed Stab</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.3.0</h4>
+                <ul style="margin-top:0px;">
+                    <li>Added basic equipment system</li>
+                    <li>Added Cracked Knife</li>
+                    <li>Added Corrupted Gnome</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.2.4</h4>
+                <ul style="margin-top:0px;">
+                    <li>Continued work on equipment system</li>
+                    <li>Added default equipment for body, hands, feet</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.2.3</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed bug with learned moves not saving</li>
+                    <li>Fixed bug with being able to relearn moves after loading a game</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.2.2</h4>
+                <ul style="margin-top:0px;">
+                    <li>Added move unlocking. Now you can use TWO moves!</li>
+                    <li>Got started on weapons</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.2.1</h4>
+                <ul style="margin-top:0px;">
+                    <li>Nerfed Rat</li>
+                    <li>Redid Main tab UI</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.2.0</h4>
+                <ul style="margin-top:0px;">
+                    <li>Shop stuff</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.12</h4>
+                <ul style="margin-top:0px;">
+                    <li>Made alerts dismissable</li>
+                    <li>Minor styling changes</li>
+                    <li>Miscellaneous bugfixes</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.11</h4>
+                <ul style="margin-top:0px;">
+                    <li>Added showing/hiding of Struggle skill</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.10</h4>
+                <ul style="margin-top:0px;">
+                    <li>Switch to AP pool based combat, rather than Pokemon-like AP system</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.9</h4>
+                <ul style="margin-top:0px;">
+                    <li>ACTUALLY fixed bug with perks not unlocking</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.8</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed bug with perks not unlocking</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.7</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed combat bug AGAIN</li>
+                    <li>Added tooltips describing item effects</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.6</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed bug with combat hanging at ailment checking, causing monsters to not attack/die</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.5</h4>
+                <ul style="margin-top:0px;">
+                    <li>Implemented Move AP</li>
+                    <li>Added Energy Tincture and added to loot tables</li>
+                    <li>Miscellaneous bugfixes</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.4</h4>
+                <ul style="margin-top:0px;">
+                    <li>Miscellaneous bugfixes</li>
+                    <li>Fixed crit rate in combat</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.3</h4>
+                <ul style="margin-top:0px;">
+                    <li>Added loot drops</li>
+                    <li>Added a potion</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.2</h4>
+                <ul style="margin-top:0px;">
+                    <li>Fixed version checking caching</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.1</h4>
+                <ul style="margin-top:0px;">
+                    <li>Rewards are now reduced/increased if you are underlevelled/overlevelled</li>
+                    <li>Miscellaneous bugfixes and UI improvements</li>
+                </ul>
+                <h4 style="margin-bottom:0px;">Version 0.1.0</h4>
+                <ul style="margin-top:0px;">
+                    <li>Finally added some basic combat! Needs some serious balancing.</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.9</h4>
+                <ul style="margin-top:0;">
+                    <li>Made levelling up actually do stuff</li>
+                    <li>Started work on combat(!!!)</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.8</h4>
+                <ul style="margin-top:0;">
+                    <li>Switched to all Bootstrap stuff</li>
+                    <li>Game is now mobile-friendly!</li>
+                    <li>Tweaked developer version checking</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.7</h4>
+                <ul style="margin-top:0;">
+                    <li>Enabled saving of perks (EVERYTHING IS SAVED NOW. LET ME KNOW IF STUFF IS BROKEN)</li>
+                    <li>Added ability to reset save</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.6</h4>
+                <ul style="margin-top:0;">
+                    <li>Fixed bug with GPS saving, but mine resetting it</li>
+                    <li>"Fixed" perks</li>
+                    <li>Enabled saving of the Gold Mine</li>
+                    <li>Added manual save/load buttons</li>
+                    <li>Added ability to toggle auto-saving</li>
+                    <li>Added ability to change character name</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.5</h4>
+                <ul style="margin-top:0;">
+                    <li>Enabled character saving</li>
+                    <li>Lowered cost of mine</li>
+                    <li>Made XP "curve" linear a la DnD</li>
+                    <li>Minor housekeeping</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.4</h4>
+                <ul style="margin-top:0;">
+                    <li>Added some more Perks</li>
+                    <li>Added version checking</li>
+                    <li>Balanced gold mine costs</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.3</h4>
+                <ul style="margin-top:0;">
+                    <li>Added gold mine!</li>
+                    <li>Added stuff to the previously-feared-useless "Main" tab</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.2</h4>
+                <ul style="margin-top:0;">
+                    <li>Added first pair of perks!</li>
+                    <li>Resized tabs</li>
+                    <li>Refined notification system. They now stack at the bottom of the screen and will push older
+                        notifications up to make room - THIS SHIT'S COOL YO<br/>
+                        <input type="button" onclick="bottomNotify('I\'m a notification!', 'info')"
+                               value="Spam this button to try it out!"/>
+                    </li>
+                    <li>Lots of behind the scenes reworking</li>
+                </ul>
+                <h4 style="margin-bottom:0;">Version 0.0.1</h4>
+                <ul style="margin-top:0;">
+                    <li>Initial release</li>
+                </ul>
+                <h2><span style="text-decoration:underline;">Planned Features</span></h2>
+                <ul>
+                    <li>EXCITING ARENA COMBAT</li>
+                    <li>INTERESTING AND COMPELLING QUESTS</li>
+                    <li>CHALLENGING DUNGEONS</li>
+                    <li>PHAT LOOT</li>
+                    <li>CRAFTING</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="charName" data-bind="text: character.name"></div>
+                    <br />
+                    <div id="level">Level <span data-bind="text: character.level"></span></div>
+                    <div id="XP"><span data-bind="text: character.currentXP"></span> / <span data-bind="text: character.neededXP"></span> XP</div>
+                    <button type="button" class="btn btn-primary btn-xs" onclick="character.clickXPButton()">Gain
+                        XP
+                    </button>
+                    <br/><br/>
+
+                    <div id="gold"><span data-bind="text: Math.floor(character.gold())"></span> gold</div>
+                    <button type="button" class="btn btn-primary btn-xs" onclick="character.clickGoldButton()">
+                        Gain Gold
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Equipment</div>
+                <div class="panel-body">
+                    <div class="panel-group" id="equippedList">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#equippedList" href="#equippedWeapon" class="collapsed">Weapon</a>
+                                </h4>
+                            </div>
+                            <div id="equippedWeapon" class="panel-collapse collapse">
+                                <div class="panel-body">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#equippedList" href="#equippedBody" class="collapsed">Body</a>
+                                </h4>
+                            </div>
+                            <div id="equippedBody" class="panel-collapse collapse">
+                                <div class="panel-body">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#equippedList" href="#equippedHands" class="collapsed">Hands</a>
+                                </h4>
+                            </div>
+                            <div id="equippedHands" class="panel-collapse collapse">
+                                <div class="panel-body">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#equippedList" href="#equippedFeet" class="collapsed">Feet</a>
+                                </h4>
+                            </div>
+                            <div id="equippedFeet" class="panel-collapse collapse">
+                                <div class="panel-body">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="noteContainer">
+        <div class="notificationBar" id="versionBar" style="display:none">There is a new version available! Refresh the
+            page
+            to update! (You may need to force a cache override; CTRL+F5)
+        </div>
+    </div>
+</div>
+    <!-- Sticky Footer -->
+<div id="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="text-muted">
+                    Copyright &copy; 2014 SystemPunch. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6">
+                <p class="text-muted text-right">
+                    <a href="/contact.html">Contact</a> | <a href="/about.html">About</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+
+<!-- Shop -->
+<div class="modal fade" id="shopModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" id="shopModalTitle">Shop</h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel-group" id="shopCategories">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#shopCategories" href="#consumableCategory">Consumables</a>
+                            </h4>
+                        </div>
+                        <div id="consumableCategory" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Cost</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="consumableShopList">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#shopCategories" href="#equipmentCategory">Equipment</a>
+                            </h4>
+                        </div>
+                        <div id="equipmentCategory" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Cost</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="equipmentShopList">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Exit Shop</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forget Skills -->
+<div class="modal fade" id="forgetSkill" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Forget Skill</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    You have gained enough proficiency to learn a new skill, but you already know four skills! You must forget one of them to learn a new skill. Please select a skill to forget, or click "Don't Learn" to keep your original skills.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Don't Learn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/resources/js/bootstrap.min.js"></script>
+
+</body>
+</html>
