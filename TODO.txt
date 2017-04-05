@@ -1,7 +1,0 @@
-- Combat
-    - Turn based
-    - Skills based on weapons/proficiencies
-    - Monster list
-- Inventory/Equipment
-- More places
-- More upgrades
